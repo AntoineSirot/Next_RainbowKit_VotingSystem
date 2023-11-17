@@ -1,3 +1,48 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@keyframes gradientAnimation {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 100%;
+    }
+}
+
+.animate-gradient-x {
+    animation: gradientAnimation 30s linear infinite;
+    /* Le temps (10s) et le type d'animation peuvent être modifiés selon vos besoins */
+    background-size: 400% 400%;
+    /* Ajustez la taille du dégradé selon votre choix */
+}
+
+/* AllPolls.css */
+
+.switch-container {
+    display: flex;
+    justify-content: space-between;
+    width: 300px;
+    /* Set width according to your preference */
+    margin-bottom: 20px;
+    background-color: #f0f0f0;
+    border-radius: 20px;
+    overflow: hidden;
+}
+
+.switch-item {
+    flex-grow: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.switch-item.active {
+    background-color: #3498db;
+    color: white;
+}
