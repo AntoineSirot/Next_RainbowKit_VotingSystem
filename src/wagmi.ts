@@ -5,13 +5,11 @@ import { sepolia, mainnet } from 'wagmi/chains'
 
 import { publicProvider } from 'wagmi/providers/public'
 
-// Take the NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID from .env
 const walletConnectProjectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID || ''
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [mainnet, ...(process.env.NODE_ENV === 'development' ? [sepolia] : [])],
+  [sepolia],
   [
-    // take the NEXT_PUBLIC_ALCHEMY_API_KEY from .env
     alchemyProvider({ apiKey: process.env.NEXT_PUBLIC_ALCHEMY_API_KEY || "" }),
     publicProvider(),
   ],
