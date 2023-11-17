@@ -1,22 +1,34 @@
-import { useState, useEffect } from 'react';
-import { useContractRead, useWaitForTransaction, useContractWrite } from 'wagmi'; // Include useContractWrite from 'wagmi'.
+'use client'
+import React, { useState, useEffect } from 'react';
+import { useContractRead, useWaitForTransaction, useContractWrite } from 'wagmi';
 import { DAOSimulationContract } from './contracts';
+import { RemainingTime } from './RemainingTime';
+import { PendingTransactionsWindow } from './PendingTransaction';
 
-export function Poll({ index }: { index: number }) {
+export function Poll({ index, filter }: { index: number, filter: string }) {
   const [voted, setVoted] = useState(false);
   const [choiceNumber, setChoiceNumber] = useState(0);
-
-  const handleChoiceClick = (choice, i) => {
-    console.log(`Choice n°${i + 1} clicked: ${choice}`);
-    setChoiceNumber(i);
-    setVoted(true);
-  };
 
   const { data: pollData, isRefetching, refetch, error } = useContractRead({
     ...DAOSimulationContract,
     functionName: 'getPoll',
     args: [BigInt(index)],
   });
+
+  const { write, data, isLoading, isError } = useContractWrite({
+    ...DAOSimulationContract,
+    functionName: 'voteOnPoll',
+  });
+
+  const { data: receipt, isLoading: isPending, isSuccess } = useWaitForTransaction({ hash: data?.hash });
+
+  useEffect(() => {
+    if (voted && !isLoading && !isError) {
+      const args = [BigInt(index), BigInt(choiceNumber)];
+      write({ args });
+      setVoted(false);
+    }
+  }, [voted, choiceNumber, index, isLoading, isError, write]);
 
   if (!pollData) {
     return (
@@ -35,48 +47,88 @@ export function Poll({ index }: { index: number }) {
     );
   }
 
+  const handleChoiceClick = (choice, i) => {
+    setChoiceNumber(i);
+    setVoted(true);
+  };
+
+
   const [, startTimestamp, finalTimestamp, description, choices, answers, voters] = pollData;
 
-  const currentTimestamp = Date.now() / 1000; // Convert milliseconds to seconds
-  const isPast = currentTimestamp > Number(finalTimestamp);
+  const currentTimestamp = Date.now() / 1000;
+  const pollIsPast = currentTimestamp > Number(finalTimestamp);
 
-  const { write, data, isLoading, isError } = useContractWrite({
-    ...DAOSimulationContract, // Use the contract from your Poll component.
-    functionName: 'voteOnPoll', // Set the function name for voting.
-  });
+  if (filter === 'active' && pollIsPast) {
+    return null;
+  }
 
-  useEffect(() => {
-    if (voted && !isLoading && !isError) {
-      const args = [BigInt(index), BigInt(choiceNumber)];
-      write({ args });
-      setVoted(false);
-    }
-  }, [voted, choiceNumber, index, isLoading, isError]);
+  if (filter === 'past' && !pollIsPast) {
+    return null;
+  }
 
-  const { data: receipt, isLoading: isPending, isSuccess } = useWaitForTransaction({ hash: data?.hash });
 
   if (isSuccess) {
     console.log('Transaction confirmed');
   }
 
+  function truncateAddress(address) {
+    if (address.length <= 10) {
+      return address;
+    } else {
+      const truncatedAddress = address.substring(0, 5) + '...' + address.slice(-3);
+      return truncatedAddress;
+    }
+  }
+
+  let activePollBackground = 'bg-orange-200';
+  let activePollTextColor = 'text-pink-950';
+  let buttonBackground = 'bg-pink-950';
+  let buttonTextColor = 'text-orange-200';
+  let cursorStyle = '';
+
+  if (pollIsPast) {
+    activePollBackground = 'bg-pink-950';
+    activePollTextColor = 'text-orange-200';
+    buttonBackground = 'bg-orange-200';
+    buttonTextColor = 'text-pink-950';
+    cursorStyle = 'not-allowed';
+  }
+
+  const votes = answers.map(Number);
+  const maxVotes = Math.max(...votes);
+  const winningChoices = votes.reduce((acc, votes, index) => {
+    if (votes === maxVotes) {
+      acc.push(index);
+    }
+    return acc;
+  }, []);
+
   return (
-    <div className={`border border-black p-4 m-4 rounded-lg text-center ${isPast ? 'bg-green-200' : 'bg-blue-200'}`}>
-      <h2 className="text-xl font-semibold">Poll n°{Number(index) + 1}: {description}</h2>
-      <p>Starting time: {new Date(Number(startTimestamp) * 1000).toLocaleString()}</p>
-      <p>End Time: {new Date(Number(finalTimestamp) * 1000).toLocaleString()}</p>
-      <div>
-        <h3 className="font-semibold mt-2">Choices:</h3>
-        {choices.map((choice, i) => (
-          <button
-            key={i}
-            onClick={isPast ? null : (() => handleChoiceClick(choice, i))}
-            className={`${isPast ? 'bg-green-500 cursor-not-allowed' : isPast ? 'bg-green-500' : 'bg-blue-500'} ${isPast ? 'pointer-events-none' : 'hover:'}${isPast ? null : isPast ? 'bg-blue-700' : 'bg-green-700'} text-white font-semibold rounded-lg px-3 py-2 m-1`}
-          >
-            {choice}: {Number(answers[i]) > 1 ? `${Number(answers[i])} Votes` : `${Number(answers[i])} Vote`}
-          </button>
-        ))}
+    <>
+      <div className={`border border-white p-8 m-8 rounded-lg text-center w-120 transition duration-300 ease-in-out transform hover:scale-110 ${activePollBackground} ${activePollTextColor}`}>
+        <h2 className="text-xl font-semibold">Poll n°{Number(index) + 1}: {description}</h2>
+        <p>Starting time: {new Date(Number(startTimestamp) * 1000).toLocaleString()}</p>
+        <p>End Time: {new Date(Number(finalTimestamp) * 1000).toLocaleString()}</p>
+        {pollIsPast ? <p className="mt-4">This poll is finished</p> : <RemainingTime finalTimestamp={Number(finalTimestamp)} />}
+        <div>
+          <h3 className="font-semibold mt-4">Choices:</h3>
+          {choices.map((choice, i) => (
+            <button
+              key={i}
+              onClick={pollIsPast ? null : ((event) => handleChoiceClick(choice, i))}
+              className={`${buttonBackground} ${winningChoices.includes(i) || !pollIsPast ? buttonTextColor : 'text-gray-500 bg-opacity-20'} font-semibold rounded-lg px-4 py-2 m-2`}
+              style={{ cursor: cursorStyle }}
+            >
+              {choice}: {votes[i]} {votes[i] === 1 ? 'Vote' : 'Votes'}
+            </button>
+          ))}
+        </div>
+        <p className="mt-4">Voters: {voters.map(voter => truncateAddress(voter)).join(', ')}</p>
       </div>
-      <p>Voters: {voters.join(', ')}</p>
-    </div>
+      {isPending && (
+        <PendingTransactionsWindow transactionHash={data?.hash} />
+      )}
+    </>
   );
+
 }
