@@ -28,5 +28,9 @@ export function RemainingTime({ finalTimestamp }: { finalTimestamp: number }) {
         return () => clearInterval(timer);
     }, []);
 
-    return <p className="mt-4">Time remaining: {timeRemaining}</p>;
+
+
+    return (
+        <p className="mt-4"  >Time remaining: {timeRemaining}</p>
+    );
 };

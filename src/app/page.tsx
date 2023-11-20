@@ -13,10 +13,10 @@ const NavBarButton = ({ label, onClick, active }: {
   active: boolean;
 }) => {
   const activeClass = active ? 'bg-orange-200 text-pink-950' : 'bg-pink-950 text-orange-200';
-  const buttonStyle = `border border-white hover:scale-110 text-center my-2 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${activeClass}`;
+  const buttonStyle = `border border-white font-bold hover:scale-110 text-center my-2 text-s px-2 py-1 rounded-sm rounded focus:outline-none focus:shadow-outline`;
 
   return (
-    <button onClick={onClick} className={buttonStyle}>
+    <button onClick={onClick} className={`${buttonStyle} ${activeClass}`}>
       {label}
     </button>
   );
@@ -41,12 +41,17 @@ const Page: React.FC = () => {
   return (
     <>
       <div className="min-h-screen bg-gradient-to-r from-pink-950 to-orange-200 animate-gradient-x flex flex-col">
-        <div className="bg-pink-950 mx-auto w-2/3 md:w-3/4 lg:w-2/3 xl:w-1/2 text-center mt-8 bg-opacity-30 py-6 flex flex-col lg:flex-row justify-between items-center">
-          <div className="ml-4 mb-2 md:ml-8 lg:ml-12 flex flex-col items-center lg:items-start">
-            <h1 className="text-2xl lg:text-4xl mt-4 font-bold text-orange-200 mb-2 lg:mb-4">DAO Simulation</h1>
-            <hr className="border-1 border-orange-300 w-1/4 lg:w-1/2 mx-auto mb-2 lg:mb-4" />
-            <ConnectButton />
+        <div className="bg-pink-950 mx-auto w-2/3 md:w-3/4 lg:w-2/3 xl:w-1/2 text-center mt-8 bg-opacity-30 pb-4 pt-2 flex flex-col lg:flex-row justify-between items-center">
+          <div className="ml-8 mb-2 md:ml-8 lg:ml-8 flex flex-col items-center lg:items-start">
+            <div className="text-center lg:text-left">
+              <h1 className="text-xl lg:text-2xl mt-4 font-bold text-orange-200 mb-2 lg:mb-4">DAO Simulation</h1>
+              <hr className="border-1 border-orange-300 w-2/3 lg:w-3/4 mx-auto mb-2 lg:mb-4" />
+            </div>
+            <div className="flex justify-center lg:justify-start w-full">
+              <ConnectButton showBalance={false} />
+            </div>
           </div>
+
           <div className="mr-4 md:mr-8 lg:mr-12 flex justify-center lg:justify-end mt-4 lg:mt-0">
             <NavBarButton
               label="All Polls"

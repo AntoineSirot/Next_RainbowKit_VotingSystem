@@ -120,7 +120,7 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
             <button
               key={i}
               onClick={pollIsPast ? undefined : () => handleChoiceClick(i)}
-              className={`${buttonBackground} ${winningChoices.includes(i) || !pollIsPast ? buttonTextColor : 'text-gray-500 bg-opacity-20'} font-semibold rounded-lg px-4 py-2 m-2`}
+              className={`${buttonBackground} hover:scale-110 ${winningChoices.includes(i) || !pollIsPast ? buttonTextColor : 'text-gray-500 bg-opacity-20'} font-semibold rounded-lg px-4 py-2 m-2`}
               style={{ cursor: cursorStyle }}
             >
               {choice}: {votes[i]} {votes[i] === 1 ? 'Vote' : 'Votes'}
