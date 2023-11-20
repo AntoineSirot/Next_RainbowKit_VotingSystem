@@ -1,15 +1,16 @@
 'use client'
 
-import React, { useState } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import { Poll } from './Poll';
 
 export function SpecificPoll() {
 
     const [index, setIndex] = useState('');
 
-    const handleIndexChange = (e) => {
+    const handleIndexChange = (e: ChangeEvent<HTMLInputElement>) => {
         setIndex(e.target.value);
     };
+
     return (
         <>
             <div className="flex justify-center mt-4">
@@ -29,7 +30,7 @@ export function SpecificPoll() {
                 <div className="w-full flex flex-wrap justify-center">
                     {index ? (
                         <div>
-                            <Poll index={Number(index) - 1} />
+                            <Poll index={Number(index) - 1} filter={"all"} />
                         </div>
                     ) : null}
                 </div>
@@ -37,4 +38,3 @@ export function SpecificPoll() {
         </>
     );
 };
-

@@ -23,33 +23,38 @@ export function CreatePoll() {
 
     useEffect(() => {
         if (created) {
-            const durationInSeconds = (days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60);
-            const args = [BigInt(durationInSeconds), description, choices];
+            const durationInSeconds = BigInt((days * 24 * 60 * 60) + (hours * 60 * 60) + (minutes * 60));
+            const args: readonly [bigint, string, readonly string[]] = [durationInSeconds, description, choices];
             write({ args });
             setCreated(false);
         }
     }, [created]);
 
-    const handleChoiceChange = (index, value) => {
+
+    const handleChoiceChange = (index: number, value: string) => {
         const newChoices = [...choices];
         newChoices[index] = value;
         setChoices(newChoices);
     };
 
-    const handleDaysChange = (value) => {
-        const newDays = value >= 0 ? value : 0;
+    const handleDaysChange = (value: string) => {
+        const parsedValue = parseInt(value, 10);
+        const newDays = parsedValue >= 0 ? parsedValue : 0;
         setDays(newDays);
     };
 
-    const handleHoursChange = (value) => {
-        const newHours = value >= 0 ? value : 0;
+    const handleHoursChange = (value: string) => {
+        const parsedValue = parseInt(value, 10);
+        const newHours = parsedValue >= 0 ? parsedValue : 0;
         setHours(newHours);
     };
 
-    const handleMinutesChange = (value) => {
-        const newMinutes = value >= 0 ? value : 0;
+    const handleMinutesChange = (value: string) => {
+        const parsedValue = parseInt(value, 10);
+        const newMinutes = parsedValue >= 0 ? parsedValue : 0;
         setMinutes(newMinutes);
     };
+
 
     const handleAddChoice = () => {
         setChoices([...choices, '']);
@@ -163,7 +168,7 @@ export function CreatePoll() {
                 {error && <p className="text-red-500">{error}</p>}
 
             </div>
-            {isPending && (
+            {isPending && data && (
                 <PendingTransactionsWindow transactionHash={data?.hash} />
             )}
         </>

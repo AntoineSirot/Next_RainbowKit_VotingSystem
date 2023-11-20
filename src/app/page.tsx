@@ -7,7 +7,11 @@ import { SpecificPoll } from '../components/SpecificPoll';
 import { CreatePoll } from '../components/CreatePoll';
 import { WatchContractEvents } from '../components/WatchContractEvents';
 
-const NavBarButton = ({ label, onClick, active }) => {
+const NavBarButton = ({ label, onClick, active }: {
+  label: string;
+  onClick: () => void;
+  active: boolean;
+}) => {
   const activeClass = active ? 'bg-orange-200 text-pink-950' : 'bg-pink-950 text-orange-200';
   const buttonStyle = `border border-white hover:scale-110 text-center my-2 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ${activeClass}`;
 
@@ -18,7 +22,7 @@ const NavBarButton = ({ label, onClick, active }) => {
   );
 };
 
-export function Page() {
+const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState('AllPolls');
 
   const renderPage = () => {
@@ -72,6 +76,6 @@ export function Page() {
         </Connected>
       </div>
     </>
-  )
-}
-export default Page
+  );
+};
+export default Page;

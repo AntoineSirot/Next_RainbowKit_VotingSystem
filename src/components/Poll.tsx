@@ -24,7 +24,7 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
 
   useEffect(() => {
     if (voted && !isLoading && !isError) {
-      const args = [BigInt(index), BigInt(choiceNumber)];
+      const args: readonly [bigint, bigint] = [BigInt(index), BigInt(choiceNumber)];
       write({ args });
       setVoted(false);
     }
@@ -47,7 +47,7 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
     );
   }
 
-  const handleChoiceClick = (choice, i) => {
+  const handleChoiceClick = (i: number) => {
     setChoiceNumber(i);
     setVoted(true);
   };
@@ -71,7 +71,7 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
     console.log('Transaction confirmed');
   }
 
-  function truncateAddress(address) {
+  function truncateAddress(address: string) {
     if (address.length <= 10) {
       return address;
     } else {
@@ -94,14 +94,18 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
     cursorStyle = 'not-allowed';
   }
 
-  const votes = answers.map(Number);
+  const votes = answers.map((vote: any) => {
+    const parsedVote = Number(vote);
+    return isNaN(parsedVote) ? 0 : parsedVote;
+  });
   const maxVotes = Math.max(...votes);
-  const winningChoices = votes.reduce((acc, votes, index) => {
-    if (votes === maxVotes) {
-      acc.push(index);
+  const winningChoices = votes.reduce((acc: number[], vote, idx) => {
+    if (vote === maxVotes) {
+      acc.push(idx);
     }
     return acc;
   }, []);
+
 
   return (
     <>
@@ -115,7 +119,7 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
           {choices.map((choice, i) => (
             <button
               key={i}
-              onClick={pollIsPast ? null : ((event) => handleChoiceClick(choice, i))}
+              onClick={pollIsPast ? undefined : () => handleChoiceClick(i)}
               className={`${buttonBackground} ${winningChoices.includes(i) || !pollIsPast ? buttonTextColor : 'text-gray-500 bg-opacity-20'} font-semibold rounded-lg px-4 py-2 m-2`}
               style={{ cursor: cursorStyle }}
             >
@@ -125,7 +129,7 @@ export function Poll({ index, filter }: { index: number, filter: string }) {
         </div>
         <p className="mt-4">Voters: {voters.map(voter => truncateAddress(voter)).join(', ')}</p>
       </div>
-      {isPending && (
+      {isPending && data && (
         <PendingTransactionsWindow transactionHash={data?.hash} />
       )}
     </>

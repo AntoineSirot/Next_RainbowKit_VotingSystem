@@ -13,13 +13,18 @@ export function AllPolls() {
     const [key, setKey] = useState(false);
     const [hideAll, setHideAll] = useState(false);
 
-    const { address } = useAccount()
+    let { address: userAddress } = useAccount()
+
+    if (!userAddress) {
+        userAddress = `0x00`
+    }
 
     const { data: boolArray, isFetched: isBoolArrayFetched, error: boolArrayError, refetch: refetchBoolArray, isRefetching: loadingBoolArray } = useContractRead({
         ...DAOSimulationContract,
         functionName: 'getVotedPolls',
-        args: [address]
+        args: [userAddress],
     });
+
 
     const { data: numberOfPolls, isFetched: lengthIsFetched, error: pollsLengthError, isRefetching: loadingRefetch, refetch: refetchAllPolls } = useContractRead({
         ...DAOSimulationContract,
@@ -65,21 +70,18 @@ export function AllPolls() {
 
 
     const pollIndices = Array.from({ length: polls }, (_, index) => index);
+    let filteredIndices: number[] = [];
 
-    let filteredIndices = [];
-    if (showVoted == 'all') {
+    if (showVoted === 'all') {
         filteredIndices = pollIndices;
-    }
-    else {
-        filteredIndices = boolArray.reduce((acc, voted, index) => {
-            if ((showVoted == 'voted' && voted) || (showVoted == 'notVoted' && !voted)) {
-                return [...acc, index];
-            }
-            return acc;
-        }, []);
+    } else if (boolArray) {
+        filteredIndices = pollIndices.filter((index) => {
+            const voted = boolArray[index];
+            return (showVoted === 'voted' && voted) || (showVoted === 'notVoted' && !voted);
+        });
     }
 
-    const handleToggleChangeVoted = (position) => {
+    const handleToggleChangeVoted = (position: number) => {
         setActiveToggleVoted(position);
         switch (position) {
             case 1:
@@ -96,7 +98,7 @@ export function AllPolls() {
         }
     };
 
-    const handleToggleChangeActive = (position) => {
+    const handleToggleChangeActive = (position: number) => {
         setActiveToggleActive(position);
         switch (position) {
             case 1:
