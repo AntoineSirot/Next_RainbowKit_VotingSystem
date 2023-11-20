@@ -10,21 +10,31 @@ export function SpecificPoll() {
     const handleIndexChange = (e) => {
         setIndex(e.target.value);
     };
-
     return (
-        <div className="text-center">
-            <label>
-                Enter Poll Number:
-                <input type="number" value={index} onChange={handleIndexChange} />
-            </label>
-            <div className="w-full flex flex-wrap justify-center">
-                {index ? (
-                    <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5">
-                        <Poll index={Number(index) - 1} />
-                    </div>
-                ) : null}
+        <>
+            <div className="flex justify-center mt-4">
+                <div className="border-2 w-60 text-center border-pink-950 rounded-lg p-4 bg-orange-200">
+                    <label className="block mb-2 font-semibold">
+                        Enter Poll Number:
+                    </label>
+                    <input
+                        type="number"
+                        value={index}
+                        onChange={handleIndexChange}
+                        className="border-2 border-pink-950 rounded-md p-2 w-full"
+                    />
+                </div>
             </div>
-        </div>
+            <div className="text-center">
+                <div className="w-full flex flex-wrap justify-center">
+                    {index ? (
+                        <div>
+                            <Poll index={Number(index) - 1} />
+                        </div>
+                    ) : null}
+                </div>
+            </div>
+        </>
     );
 };
 
