@@ -28,7 +28,7 @@ export function PendingTransactionsWindow({ transactionHash }: { transactionHash
                         bottom: 0,
                         right: 0,
                         padding: '10px',
-                        background: '#eee',
+                        background: '#6f9ed7',
                         zIndex: 999,
                     }}
                 >

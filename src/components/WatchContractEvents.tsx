@@ -1,6 +1,5 @@
 'use client'
 import { useState, useEffect } from 'react'
-import type { Log } from 'viem'
 import { useContractEvent } from 'wagmi'
 
 import { DAOSimulationContract } from './contracts'
@@ -15,8 +14,7 @@ export function WatchContractEvents() {
         listener: (logs) => {
             const latestLog = logs[logs.length - 1]
             const voterAddress = latestLog.args.voter
-            const pollId = latestLog.args.id
-            setLatestEvent(`New vote on the poll n°${pollId} by ${voterAddress}`)
+            setLatestEvent(`New vote in a poll by ${voterAddress}`)
             setShowWindow(true)
             setTimeout(() => {
                 setShowWindow(false)
@@ -26,13 +24,12 @@ export function WatchContractEvents() {
 
     useContractEvent({
         ...DAOSimulationContract,
-        eventName: 'PoolCreated',
+        eventName: 'PollCreated',
         listener: (logs) => {
             const latestLog = logs[logs.length - 1]
             const creatorAddress = latestLog.args.creator
-            const pollId = latestLog.args.id
             const description = latestLog.args.description
-            setLatestEvent(`New poll has been created by ${creatorAddress}: ${description} (poll n°${pollId})`)
+            setLatestEvent(`New poll has been created by ${creatorAddress}: ${description}`)
             setShowWindow(true)
             setTimeout(() => {
                 setShowWindow(false)
@@ -58,7 +55,7 @@ export function WatchContractEvents() {
     return (
         <div>
             {showWindow && (
-                <div style={{ position: 'fixed', bottom: 0, left: 0, padding: '10px', background: '#eee', zIndex: 999 }}>
+                <div style={{ position: 'fixed', bottom: 0, left: 0, padding: '10px', background: '#94d76f', zIndex: 999 }}>
                     <p>{latestEvent}</p>
                     <button onClick={closeWindow}>Close</button>
                 </div>
